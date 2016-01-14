@@ -556,9 +556,7 @@
                 if (typeof value === 'function') {
                     sinon.stub(service, key, value);
                 } else {
-                    sinon.stub(service, key, function() {
-                        return value;
-                    });
+                    sinon.stub(service, key).returns(value);
                 }
             } else {
                 service[key] = value;
