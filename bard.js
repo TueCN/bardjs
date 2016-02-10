@@ -629,9 +629,17 @@
      *  For use with ngMocks; doesn't work for async server integration tests
      */
     function verifyNoOutstandingHttpRequests () {
-        afterEach(angular.mock.inject(function($httpBackend) {
-            $httpBackend.verifyNoOutstandingExpectation();
-            $httpBackend.verifyNoOutstandingRequest();
+        afterEach(angular.mock.inject(function ($httpBackend) {
+            try {
+                $httpBackend.verifyNoOutstandingExpectation();
+                $httpBackend.verifyNoOutstandingRequest();
+            } catch (e) {
+                if (e instanceof Error) {
+                    this.test.error(e); //signal error to mocha - see https://github.com/mochajs/mocha/wiki/Conditionally-failing-tests-in-afterEach()-hooks
+                } else {
+                    throw e; //nothing we can do - this will halt the suite as long as https://github.com/mochajs/mocha/issues/1635 is not fixed
+                }
+            }
         }));
     }
 
