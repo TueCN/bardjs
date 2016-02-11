@@ -1,5 +1,9 @@
 bardjs Change Log
 ===================
+### 0.1.9
+- Changed verifyNoOutstandingHttpRequests to wrap its verification in a try/catch so mocha can be informed about the error in a nice way that doesn't halt the test suite
+- Changed the mockService function to create a stub instead of a spy when the value of a config obj property is a non-function value. This makes it possible to dynamically configure the stub while testing
+
 ### 0.1.8
 - no functional changes.
 - reversed 0.1.7. Apparently [peerDependecies are a horrible idea](https://github.com/npm/npm/issues/5080) and have been deprecated. It also seems that bardjs is DIRECTLY dependent on sinon so it's back to being a dependency.
