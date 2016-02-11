@@ -1,7 +1,7 @@
 /**
  * bardjs - Spec helpers for testing angular v.1.x apps with Mocha, Jasmine or QUnit
  * @authors John Papa,Ward Bell
- * @version v0.1.8
+ * @version v0.1.9
  * @link https://github.com/wardbell/bardjs
  * @license MIT
  */
@@ -561,11 +561,9 @@
 
             if (typeof service[key] === 'function') {
                 if (typeof value === 'function') {
-                    service[key] = value;
+                    sinon.stub(service, key, value);
                 } else {
-                    sinon.stub(service, key, function() {
-                        return value;
-                    });
+                    sinon.stub(service, key).returns(value);
                 }
             } else {
                 service[key] = value;
@@ -638,9 +636,17 @@
      *  For use with ngMocks; doesn't work for async server integration tests
      */
     function verifyNoOutstandingHttpRequests () {
-        afterEach(angular.mock.inject(function($httpBackend) {
-            $httpBackend.verifyNoOutstandingExpectation();
-            $httpBackend.verifyNoOutstandingRequest();
+        afterEach(angular.mock.inject(function ($httpBackend) {
+            try {
+                $httpBackend.verifyNoOutstandingExpectation();
+                $httpBackend.verifyNoOutstandingRequest();
+            } catch (e) {
+                if (e instanceof Error) {
+                    this.test.error(e); //signal error to mocha - see https://github.com/mochajs/mocha/wiki/Conditionally-failing-tests-in-afterEach()-hooks
+                } else {
+                    throw e; //nothing we can do - this will halt the suite as long as https://github.com/mochajs/mocha/issues/1635 is not fixed
+                }
+            }
         }));
     }
 
